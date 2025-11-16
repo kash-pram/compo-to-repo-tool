@@ -77,3 +77,7 @@ Use fs to copy specific files to temp folder
 Initialize git in temp folder
 Push to target repository
 Run script manually or via npm command
+
+
+Tell me which approach you prefer, and I'll give you detailed step-by-step implementation instructions!
+Would you like me to provide the actual implementation for any of these approaches?
