@@ -1,0 +1,31 @@
+{
+  "baseFiles": [
+    "package.json",
+    "angular.json",
+    "tsconfig.json",
+    "tsconfig.app.json",
+    "tsconfig.spec.json",
+    ".gitignore",
+    "src/main.ts",
+    "src/index.html",
+    "src/styles.css",
+    "src/styles.scss",
+    "src/app/app.ts",
+    "src/app/app.html",
+    "src/app/app.css",
+    "src/app/app.config.ts",
+    "src/app/app.routes.ts"
+  ],
+  "githubUsername": "kash-pram",
+  "defaultVisibility": "public",
+  "alwaysIncludeFolders": [
+    "src/app/services",
+    "src/app/models",
+    "src/app/shared",
+    "src/environments"
+  ],
+  "alwaysIncludeFiles": [
+    "src/environments/environment.ts",
+    "src/environments/environment.prod.ts"
+  ]
+}
