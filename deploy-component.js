@@ -558,6 +558,162 @@ Generated using Angular Component Deployment Tool
 `;
 }
 
+function createGitHubPagesWorkflow(tempDir, repoName) {
+  const workflowDir = path.join(tempDir, '.github', 'workflows');
+  fs.mkdirSync(workflowDir, { recursive: true });
+  
+  const workflowContent = `name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# ADD THESE PERMISSIONS
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Check for lock file
+        id: check-lock
+        run: |
+          if [ -f "package-lock.json" ]; then
+            echo "LOCK_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "LOCK_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Install dependencies (with lock file)
+        if: steps.check-lock.outputs.LOCK_EXISTS == 'true'
+        run: npm ci
+      
+      - name: Install dependencies (without lock file)
+        if: steps.check-lock.outputs.LOCK_EXISTS == 'false'
+        run: npm install
+      
+      - name: Get project name from angular.json
+        id: project-name
+        run: |
+          PROJECT_NAME=$(node -pe "Object.keys(require('./angular.json').projects)[0]")
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
+      
+      - name: Build
+        run: npm run build -- --configuration production --base-href /${repoName}/
+      
+      - name: Check for browser folder
+        id: check-browser
+        run: |
+          if [ -d "dist/\${{ steps.project-name.outputs.PROJECT_NAME }}/browser" ]; then
+            echo "BUILD_DIR=dist/\${{ steps.project-name.outputs.PROJECT_NAME }}/browser" >> $GITHUB_OUTPUT
+          else
+            echo "BUILD_DIR=dist/\${{ steps.project-name.outputs.PROJECT_NAME }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: \${{ secrets.GITHUB_TOKEN }}
+          publish_dir: \${{ steps.check-browser.outputs.BUILD_DIR }}
+          publish_branch: gh-pages
+`;
+  
+  const workflowPath = path.join(workflowDir, 'deploy.yml');
+  fs.writeFileSync(workflowPath, workflowContent);
+  
+  return workflowPath;
+}
+
+function create404Page(tempDir) {
+  const indexPath = path.join(tempDir, 'src', 'index.html');
+  const dest404Path = path.join(tempDir, 'src', '404.html');
+  
+  if (fs.existsSync(indexPath)) {
+    fs.copyFileSync(indexPath, dest404Path);
+    return true;
+  }
+  return false;
+}
+
+function updateAngularJsonForGitHubPages(tempDir, repoName) {
+  const angularJsonPath = path.join(tempDir, 'angular.json');
+  
+  if (!fs.existsSync(angularJsonPath)) {
+    console.warn('⚠️  angular.json not found, skipping base href configuration');
+    return false;
+  }
+  
+  try {
+    const angularJson = JSON.parse(fs.readFileSync(angularJsonPath, 'utf8'));
+    const projectName = Object.keys(angularJson.projects)[0];
+    
+    // Add 404.html to assets
+    if (!angularJson.projects[projectName].architect.build.options.assets) {
+      angularJson.projects[projectName].architect.build.options.assets = [];
+    }
+    
+    const assets = angularJson.projects[projectName].architect.build.options.assets;
+    if (!assets.includes('src/404.html')) {
+      assets.push('src/404.html');
+    }
+    
+    // Set base href for production
+    if (!angularJson.projects[projectName].architect.build.configurations) {
+      angularJson.projects[projectName].architect.build.configurations = {};
+    }
+    
+    if (!angularJson.projects[projectName].architect.build.configurations.production) {
+      angularJson.projects[projectName].architect.build.configurations.production = {};
+    }
+    
+    angularJson.projects[projectName].architect.build.configurations.production.baseHref = `/${repoName}/`;
+    
+    fs.writeFileSync(angularJsonPath, JSON.stringify(angularJson, null, 2));
+    return true;
+  } catch (error) {
+    console.warn('⚠️  Error updating angular.json:', error.message);
+    return false;
+  }
+}
+
+// Add this function to update package.json scripts
+function addDeployScript(tempDir, repoName) {
+  const packageJsonPath = path.join(tempDir, 'package.json');
+  
+  if (!fs.existsSync(packageJsonPath)) {
+    return false;
+  }
+  
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    
+    if (!packageJson.scripts) {
+      packageJson.scripts = {};
+    }
+    
+    // Add manual deploy script
+    packageJson.scripts['deploy:manual'] = `ng build --configuration production --base-href /${repoName}/ && npx gh-pages -d dist/$(node -pe "Object.keys(require('./angular.json').projects)[0]")/browser`;
+    
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+    return true;
+  } catch (error) {
+    console.warn('⚠️  Error updating package.json scripts:', error.message);
+    return false;
+  }
+}
+
 // Main deployment function
 async function deployComponent() {
   console.log('🚀 Angular Component Deployment Tool\n');
@@ -674,6 +830,22 @@ async function deployComponent() {
     
     console.log('📦 Creating filtered package.json...');
     const packageStats = createFilteredPackageJson(tempDir, usedPackages);
+    
+    console.log('🔒 Generating package-lock.json...');
+    const originalDir = process.cwd(); // Save original directory
+    
+    try {
+      process.chdir(tempDir);
+      exec('npm install --package-lock-only', { stdio: 'pipe' });
+      console.log('✓ package-lock.json generated\n');
+    } catch (error) {
+      console.warn('⚠️  Could not generate package-lock.json');
+      console.warn('   Workflow will use npm install instead of npm ci\n');
+    } finally {
+      // Always return to original directory, even if error occurs
+      process.chdir(originalDir);
+    }
+
     if (packageStats) {
         console.log(`✓ Filtered package.json created:`);
         console.log(`   Dependencies: ${packageStats.dependencies}`);
@@ -766,6 +938,44 @@ Thumbs.db
       console.log('✓ Created .gitignore\n');
     }
     
+    // Step 12.5: Setup GitHub Pages (if enabled)
+    if (config.githubPages && config.githubPages.enabled) {
+      console.log('🌐 Setting up GitHub Pages...\n');
+      
+      // Create GitHub Actions workflow
+      if (config.githubPages.createWorkflow) {
+        console.log('📝 Creating GitHub Actions workflow...');
+        createGitHubPagesWorkflow(tempDir, repoName);
+        console.log('✓ Workflow created at .github/workflows/deploy.yml\n');
+      }
+      
+      // Create 404.html
+      if (config.githubPages.create404) {
+        console.log('📄 Creating 404.html...');
+        if (create404Page(tempDir)) {
+          console.log('✓ 404.html created\n');
+        } else {
+          console.log('⚠️  Could not create 404.html\n');
+        }
+      }
+      
+      // Update angular.json
+      console.log('⚙️  Updating angular.json for GitHub Pages...');
+      if (updateAngularJsonForGitHubPages(tempDir, repoName)) {
+        console.log('✓ angular.json updated with base href and 404.html\n');
+      } else {
+        console.log('⚠️  Could not update angular.json\n');
+      }
+      
+      // Add deploy script
+      console.log('📜 Adding deployment script to package.json...');
+      if (addDeployScript(tempDir, repoName)) {
+        console.log('✓ Deploy script added (npm run deploy:manual)\n');
+      } else {
+        console.log('⚠️  Could not add deploy script\n');
+      }
+    }
+    
     // Step 13: Initialize git and push
     console.log('🔧 Initializing Git repository...');
     process.chdir(tempDir);
@@ -780,6 +990,22 @@ Thumbs.db
     exec('git push -u origin main');
     console.log('✓ Pushed successfully!\n');
     
+    // Step 13.5: Setup GitHub Pages instructions
+    if (config.githubPages && config.githubPages.enabled) {
+      console.log('🌐 GitHub Pages Setup Instructions:\n');
+      console.log('   The gh-pages branch will be created automatically when GitHub Actions runs.');
+      console.log('   To enable GitHub Pages:\n');
+      console.log('   1. Wait for GitHub Actions to complete (check the Actions tab)');
+      console.log(`   2. Go to ${repoUrl}/settings/pages`);
+      console.log('   3. Source: "Deploy from a branch"');
+      console.log('   4. Branch: "gh-pages" / "/ (root)"');
+      console.log('   5. Click "Save"\n');
+      
+      const pagesUrl = `https://${config.githubUsername}.github.io/${repoName}/`;
+      console.log(`   🔗 Your site will be available at: ${pagesUrl}`);
+      console.log('   ⏳ First deployment takes 2-3 minutes\n');
+    }
+    
     // Step 14: Cleanup
     process.chdir('..');
     fs.rmSync(tempDir, { recursive: true, force: true });
@@ -792,6 +1018,14 @@ Thumbs.db
     console.log(`🔗 Repository: ${repoUrl}`);
     console.log(`👁️  Visibility: ${repoVisibility}`);
     console.log(`📊 Dependencies: ${depsCount} items`);
+    
+    if (config.githubPages && config.githubPages.enabled) {
+      console.log(`🌐 GitHub Pages: Enabled`);
+      console.log(`🔗 Site URL: https://${config.githubUsername}.github.io/${repoName}/`);
+      console.log(`⚙️  Auto-deploy: On push to main branch`);
+      console.log(`🛠️  Manual deploy: npm run deploy:manual`);
+    }
+    
     console.log('═══════════════════════════════════════\n');
     
   } catch (error) {

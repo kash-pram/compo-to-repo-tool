@@ -27,5 +27,10 @@
   "alwaysIncludeFiles": [
     "src/environments/environment.ts",
     "src/environments/environment.prod.ts"
-  ]
+  ],
+  "githubPages": {
+    "enabled": true,
+    "createWorkflow": true,
+    "create404": true
+  }
 }
