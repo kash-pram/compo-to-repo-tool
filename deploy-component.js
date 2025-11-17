@@ -990,43 +990,169 @@ Thumbs.db
     exec('git push -u origin main');
     console.log('✓ Pushed successfully!\n');
     
-    // Step 13.5: Setup GitHub Pages instructions
+    // Step 13.5: Auto-enable GitHub Pages after workflow completes
     if (config.githubPages && config.githubPages.enabled) {
-      console.log('🌐 GitHub Pages Setup Instructions:\n');
-      console.log('   The gh-pages branch will be created automatically when GitHub Actions runs.');
-      console.log('   To enable GitHub Pages:\n');
-      console.log('   1. Wait for GitHub Actions to complete (check the Actions tab)');
-      console.log(`   2. Go to ${repoUrl}/settings/pages`);
-      console.log('   3. Source: "Deploy from a branch"');
-      console.log('   4. Branch: "gh-pages" / "/ (root)"');
-      console.log('   5. Click "Save"\n');
+      console.log('🌐 Setting up GitHub Pages automation...\n');
       
       const pagesUrl = `https://${config.githubUsername}.github.io/${repoName}/`;
-      console.log(`   🔗 Your site will be available at: ${pagesUrl}`);
-      console.log('   ⏳ First deployment takes 2-3 minutes\n');
+      
+      console.log('⏳ Waiting for GitHub Actions to complete and create gh-pages branch...');
+      console.log('   Checking every 15 seconds (max 5 minutes)...\n');
+      
+      // Function to check workflow status
+      function checkWorkflowStatus() {
+        try {
+          const result = execSync(
+            `gh run list --repo ${config.githubUsername}/${repoName} --limit 1 --json status,conclusion`,
+            { encoding: 'utf8', stdio: 'pipe' }
+          );
+          const runs = JSON.parse(result);
+          if (runs.length > 0) {
+            return runs[0]; // { status: "completed", conclusion: "success" }
+          }
+        } catch (error) {
+          return null;
+        }
+        return null;
+      }
+      
+      // Function to check if gh-pages branch exists
+      function ghPagesBranchExists() {
+        try {
+          execSync(
+            `gh api repos/${config.githubUsername}/${repoName}/branches/gh-pages`,
+            { encoding: 'utf8', stdio: 'pipe' }
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      }
+      
+      // Function to enable GitHub Pages
+      function enablePages() {
+        try {
+          execSync(
+            `gh api repos/${config.githubUsername}/${repoName}/pages -X POST -f source[branch]=gh-pages -f source[path]=/`,
+            { encoding: 'utf8', stdio: 'pipe' }
+          );
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+      
+      // Polling function
+      let attempts = 0;
+      const maxAttempts = 20; // 5 minutes (20 * 15 seconds)
+      
+      const pollInterval = setInterval(() => {
+        attempts++;
+        
+        const workflowStatus = checkWorkflowStatus();
+        
+        if (workflowStatus && workflowStatus.status === 'completed') {
+          if (workflowStatus.conclusion === 'success') {
+            process.stdout.write(' ✓\n');
+            console.log('✓ GitHub Actions workflow completed successfully!\n');
+            
+            console.log('🔍 Checking for gh-pages branch...');
+            if (ghPagesBranchExists()) {
+              console.log('✓ gh-pages branch exists!\n');
+              
+              console.log('🌐 Enabling GitHub Pages...');
+              if (enablePages()) {
+                clearInterval(pollInterval);
+                console.log('✓ GitHub Pages enabled successfully!\n');
+                console.log('═══════════════════════════════════════');
+                console.log(`🎉 Your site is live at: ${pagesUrl}`);
+                console.log('   (May take 1-2 more minutes to be fully available)');
+                console.log('═══════════════════════════════════════\n');
+                finishDeployment();
+              } else {
+                clearInterval(pollInterval);
+                console.log('⚠️  Could not auto-enable GitHub Pages.\n');
+                printManualInstructions();
+                finishDeployment();
+              }
+            } else {
+              clearInterval(pollInterval);
+              console.log('⚠️  gh-pages branch not found after workflow completion.\n');
+              printManualInstructions();
+              finishDeployment();
+            }
+          } else {
+            clearInterval(pollInterval);
+            process.stdout.write(' ✗\n');
+            console.log(`✗ Workflow failed with conclusion: ${workflowStatus.conclusion}\n`);
+            console.log(`   Check workflow logs: ${repoUrl}/actions\n`);
+            printManualInstructions();
+            finishDeployment();
+          }
+        } else if (attempts >= maxAttempts) {
+          clearInterval(pollInterval);
+          process.stdout.write(' ⏱️\n');
+          console.log('\n⏱️  Timeout: Workflow is taking longer than expected.\n');
+          printManualInstructions();
+          finishDeployment();
+        } else {
+          // Show progress
+          process.stdout.write('.');
+        }
+      }, 15000); // Check every 15 seconds
+      
+      function printManualInstructions() {
+        console.log('📋 Manual Setup Instructions:\n');
+        console.log(`1. Check workflow status: ${repoUrl}/actions`);
+        console.log(`2. Once complete, go to: ${repoUrl}/settings/pages`);
+        console.log('3. Source: "Deploy from a branch"');
+        console.log('4. Branch: "gh-pages" / "/ (root)"');
+        console.log('5. Click "Save"');
+        console.log(`6. Your site will be live at: ${pagesUrl}\n`);
+      }
+      
+      function finishDeployment() {
+        // Step 14: Cleanup
+        const currentDir = process.cwd();
+        if (currentDir.includes('temp-deploy')) {
+          process.chdir('..');
+        }
+        if (fs.existsSync(tempDir)) {
+          fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+        console.log('✓ Cleanup complete!\n');
+        
+        // Success message
+        printSuccessMessage();
+      }
+      
+      // Don't continue until polling completes
+      return;
     }
     
-    // Step 14: Cleanup
+    // If GitHub Pages not enabled, continue normally
     process.chdir('..');
     fs.rmSync(tempDir, { recursive: true, force: true });
     console.log('✓ Cleanup complete!\n');
+    printSuccessMessage();
     
-    // Success message
-    console.log('🎉 SUCCESS! Deployment completed!\n');
-    console.log('═══════════════════════════════════════');
-    console.log(`📦 Component: ${componentName}`);
-    console.log(`🔗 Repository: ${repoUrl}`);
-    console.log(`👁️  Visibility: ${repoVisibility}`);
-    console.log(`📊 Dependencies: ${depsCount} items`);
-    
-    if (config.githubPages && config.githubPages.enabled) {
-      console.log(`🌐 GitHub Pages: Enabled`);
-      console.log(`🔗 Site URL: https://${config.githubUsername}.github.io/${repoName}/`);
-      console.log(`⚙️  Auto-deploy: On push to main branch`);
-      console.log(`🛠️  Manual deploy: npm run deploy:manual`);
+    function printSuccessMessage() {
+      console.log('🎉 SUCCESS! Deployment completed!\n');
+      console.log('═══════════════════════════════════════');
+      console.log(`📦 Component: ${componentName}`);
+      console.log(`🔗 Repository: ${repoUrl}`);
+      console.log(`👁️  Visibility: ${repoVisibility}`);
+      console.log(`📊 Dependencies: ${depsCount} items`);
+      
+      if (config.githubPages && config.githubPages.enabled) {
+        console.log(`🌐 GitHub Pages: Enabled`);
+        console.log(`🔗 Site URL: https://${config.githubUsername}.github.io/${repoName}/`);
+        console.log(`⚙️  Auto-deploy: On push to main branch`);
+        console.log(`🛠️  Manual deploy: npm run deploy:manual`);
+      }
+      
+      console.log('═══════════════════════════════════════\n');
     }
-    
-    console.log('═══════════════════════════════════════\n');
     
   } catch (error) {
     console.error('\n❌ Deployment failed!');
