@@ -170,31 +170,47 @@ function detectNpmDependencies(componentPath) {
     
     const content = fs.readFileSync(filePath, 'utf8');
     
-    // Match import statements for npm packages (not relative imports)
-    const importRegex = /import\s+(?:{[^}]*}|[\w*]+)\s+from\s+['"]([^'"]+)['"]/g;
+    // Match ALL import statement patterns
+    const patterns = [
+      // import { x } from 'package'
+      /import\s+{[^}]*}\s+from\s+['"]([^'"]+)['"]/g,
+      // import x from 'package'
+      /import\s+[\w]+\s+from\s+['"]([^'"]+)['"]/g,
+      // import * as x from 'package'
+      /import\s+\*\s+as\s+[\w]+\s+from\s+['"]([^'"]+)['"]/g,
+      // import 'package'
+      /import\s+['"]([^'"]+)['"]/g
+    ];
     
-    let match;
-    while ((match = importRegex.exec(content)) !== null) {
-      const importPath = match[1];
-      
-      // Skip relative imports (starting with . or /)
-      if (importPath.startsWith('.') || importPath.startsWith('/')) {
-        continue;
+    patterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const importPath = match[1];
+        
+        // Skip relative imports (starting with . or /)
+        if (importPath.startsWith('.') || importPath.startsWith('/')) {
+          continue;
+        }
+        
+        // Skip @angular packages (already included in core)
+        if (importPath.startsWith('@angular')) {
+          continue;
+        }
+        
+        // Extract package name (handle scoped packages)
+        let packageName;
+        if (importPath.startsWith('@')) {
+          // Scoped package: @foo/bar -> @foo/bar
+          const parts = importPath.split('/');
+          packageName = `${parts[0]}/${parts[1]}`;
+        } else {
+          // Regular package: lodash/get -> lodash
+          packageName = importPath.split('/')[0];
+        }
+        
+        usedPackages.add(packageName);
       }
-      
-      // Extract package name (handle scoped packages like @angular/core)
-      let packageName;
-      if (importPath.startsWith('@')) {
-        // Scoped package: @angular/core -> @angular/core
-        const parts = importPath.split('/');
-        packageName = `${parts[0]}/${parts[1]}`;
-      } else {
-        // Regular package: lodash/get -> lodash
-        packageName = importPath.split('/')[0];
-      }
-      
-      usedPackages.add(packageName);
-    }
+    });
   }
   
   function scanDirectory(dir) {
