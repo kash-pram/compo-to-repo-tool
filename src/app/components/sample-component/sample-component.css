@@ -1,0 +1,21 @@
+.component-box {
+    background: #ffffff;
+    padding: 22px 34px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+    display: flex;
+    justify-content: center;   /* centers items horizontally */
+    align-items: center;       /* centers items vertically */
+    gap: 12px;
+
+    text-align: center;
+    max-width: 90%;
+
+    font-size: clamp(1rem, 2vw, 1.4rem);
+}
+
+.emoji {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    line-height: 1;  /* fixes vertical alignment */
+}

@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
