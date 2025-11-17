@@ -16,7 +16,7 @@
     "src/app/app.config.ts",
     "src/app/app.routes.ts"
   ],
-  "githubUsername": "kash-pram",
+  "githubUsername": "your-github-username",
   "defaultVisibility": "public",
   "alwaysIncludeFolders": [
     "src/app/services",
