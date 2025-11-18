@@ -34,12 +34,27 @@ npm run deploy-component
 
 ## Purpose 🎯
 
-1 base Angular project + any number of components + (Angular Component Deployment Automation Tool) ----> individual repository per component with live demo Github pages, auto generated readme.
+Generate components using AI, drop them into this Angular base project, install the dependencies, and deploy to GitHub Pages with a single command. No more manual repository setup, dependency hunting, or configuration headaches.
 
-🛠️
-
-> Generate components using AI, drop them into this Angular base project, install the dependencies, and deploy to GitHub Pages with a single command. No more manual repository setup, dependency hunting, or configuration headaches.
-
+```
+┌──────────────────────┐          ┌──────────────────────┐
+│  Base Angular        │          │  Component(s)        │
+│  Project             │          │  (Ready to deploy)   │
+└──────────┬───────────┘          └──────────┬───────────┘
+           │                                 │
+           └────────────┬────────────────────┘
+                        │
+                        ▼
+           ┌────────────────────────────────┐
+           │  Deployment Automation Tool    │
+           └────────────┬───────────────────┘
+                        │
+                        ▼
+           ┌────────────────────────────────┐
+           │  Repository per component      │
+           │  (GitHub Pages enabled)        │
+           └────────────────────────────────┘
+```
 
 ### The Problem It Solves
 
@@ -226,7 +241,7 @@ src/app/components/
     └── your-component.css
 ```
 
-### [To execute the automation script - to deploy the component to Github]
+## [Execute the automation script - to deploy the component to Github]
 
 ```bash
 # Run the deployment command
