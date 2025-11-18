@@ -32,14 +32,13 @@ npm run deploy-component
 
 ---
 
-## 🎯 Purpose
+## Purpose 🎯
 
 1 base Angular project + any number of components + (Angular Component Deployment Automation Tool) ----> individual repository per component with live demo Github pages, auto generated readme.
 
 🛠️
 
 > Generate components using AI, drop them into this Angular base project, install the dependencies, and deploy to GitHub Pages with a single command. No more manual repository setup, dependency hunting, or configuration headaches.
-
 
 
 ### The Problem It Solves
@@ -75,7 +74,7 @@ Live demo at: your-username.github.io/component-name
 
 ---
 
-## 📦 Prerequisites
+## Prerequisites 📦
 
 ![Angular](https://img.shields.io/badge/Angular-20-red?style=flat-square&logo=angular) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript) ![Node.js](https://img.shields.io/badge/Node.js-16+-green?style=flat-square&logo=node.js) ![GitHub CLI](https://img.shields.io/badge/GitHub_CLI-2.0+-black?style=flat-square&logo=github)
 
@@ -136,7 +135,7 @@ gh auth login
 
 ---
 
-## 🔥 Checklist
+## Checklist 🔥 
 
 - [ ] Node.js 16+ installed
 - [ ] Git installed and configured
@@ -150,7 +149,7 @@ gh auth login
 - [ ] Celebrate! 🎉
 
 
-## ✅ Pre-Deployment Checklist
+### ✅ Pre-Deployment Checklist
 
 Before running the tool, verify:
 
@@ -164,9 +163,9 @@ Before running the tool, verify:
 
 ---
 
-## 🚀 Setup
+## Setup 🚀
 
-## [To setup the code files]
+### [To setup the code files]
 
 ### Method 1: Using this repository (Base Angular Project + Deployment Automation Script & Config)
 
@@ -227,14 +226,14 @@ src/app/components/
     └── your-component.css
 ```
 
-## [To execute the automation script - to deploy the component to Github]
+### [To execute the automation script - to deploy the component to Github]
 
 ```bash
 # Run the deployment command
 npm run deploy-component
 ```
 
-## 🚦 Post-Deployment Checklist
+### 🚦 Post-Deployment Checklist
 
 After running the tool, verify:
 
@@ -266,7 +265,7 @@ Visit the site URL to see your deployed component live! 🚀
 
 ---
 
-## 🔍 Workflow
+## Workflow 🔍
 
 Please refer to the **[workflow](docs/workflow.md)** and **[tips](docs/tips.md)** document.
 
@@ -278,7 +277,7 @@ Please refer to the **[configurations](docs/configurations.md)** document.
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting 🔧
 
 Please refer to the **[troubleshooting](docs/troubleshooting.md)** document.
 
