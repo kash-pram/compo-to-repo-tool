@@ -22,13 +22,13 @@ npm run deploy-component
 
 ## 📋 Table of Contents
 
-- [Purpose](#purpose)
-- [Prerequisites](#prerequisites)
-- [Checklist](#checklist)
-- [Setup](#setup)
-- [Workflow - Tips](#workflow)
-- [Configuration - File Structure - Customization](#configuration)
-- [Troubleshooting](#troubleshooting)
+- [Purpose](#purpose-)
+- [Prerequisites](#prerequisites-)
+- [Checklist](#checklist-)
+- [Setup](#setup-)
+- [Workflow - Tips](#workflow-)
+- [Configuration - File Structure - Customization](#configuration-️---file-structure----customization-)
+- [Troubleshooting](#troubleshooting-)
 
 ---
 
@@ -271,7 +271,7 @@ Please refer to the **[workflow](docs/workflow.md)** and **[tips](docs/tips.md)*
 
 ---
 
-## ⚙️ Configuration - 📁 File Structure - 🎨 Customization
+## Configuration ⚙️ - File Structure 📁 - Customization 🎨
 
 Please refer to the **[configurations](docs/configurations.md)** document.
 
