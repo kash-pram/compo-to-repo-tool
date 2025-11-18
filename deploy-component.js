@@ -26,6 +26,7 @@ function exec(command, options = {}) {
   }
 }
 
+// Utility: Execute command with retry logic
 function execWithRetry(command, options = {}, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -34,10 +35,15 @@ function execWithRetry(command, options = {}, maxRetries = 3) {
       if (i === maxRetries - 1) {
         throw error;
       }
-      console.log(`   Retry ${i + 1}/${maxRetries}...`);
+      console.log(`   Retry ${i + 1}/${maxRetries - 1}...`);
       // Wait before retrying (exponential backoff)
       const waitTime = Math.pow(2, i) * 1000;
-      execSync(`sleep ${waitTime / 1000}`, { stdio: 'pipe' });
+      
+      // Use a blocking sleep
+      const start = Date.now();
+      while (Date.now() - start < waitTime) {
+        // Busy wait
+      }
     }
   }
 }
@@ -918,9 +924,14 @@ async function deployComponent() {
     if (description.trim()) {
       createCommand += ` --description "${description.trim()}"`;
     }
-    
-    exec(createCommand);
-    console.log('✓ Repository created successfully!\n');
+
+    try {
+      execWithRetry(createCommand);
+      console.log('✓ Repository created successfully!\n');
+    } catch (error) {
+      console.error('❌ Failed to create repository after retries');
+      throw error;
+    }
     
     const repoUrl = `https://github.com/${config.githubUsername}/${repoName}`;
     console.log(`🔗 Repository URL: ${repoUrl}\n`);
@@ -1161,13 +1172,14 @@ Thumbs.db
       // Function to check workflow status
       function checkWorkflowStatus() {
         try {
-          const result = execSync(
+          const result = execWithRetry(  // USE execWithRetry
             `gh run list --repo ${config.githubUsername}/${repoName} --limit 1 --json status,conclusion`,
-            { encoding: 'utf8', stdio: 'pipe' }
+            { encoding: 'utf8', stdio: 'pipe' },
+            2  // Only 2 retries for status checks
           );
           const runs = JSON.parse(result);
           if (runs.length > 0) {
-            return runs[0]; // { status: "completed", conclusion: "success" }
+            return runs[0];
           }
         } catch (error) {
           return null;
@@ -1178,9 +1190,10 @@ Thumbs.db
       // Function to check if gh-pages branch exists
       function ghPagesBranchExists() {
         try {
-          execSync(
+          execWithRetry(  // USE execWithRetry
             `gh api repos/${config.githubUsername}/${repoName}/branches/gh-pages`,
-            { encoding: 'utf8', stdio: 'pipe' }
+            { encoding: 'utf8', stdio: 'pipe' },
+            2
           );
           return true;
         } catch {
@@ -1191,9 +1204,10 @@ Thumbs.db
       // Function to enable GitHub Pages
       function enablePages() {
         try {
-          execSync(
+          execWithRetry(  // USE execWithRetry
             `gh api repos/${config.githubUsername}/${repoName}/pages -X POST -f source[branch]=gh-pages -f source[path]=/`,
-            { encoding: 'utf8', stdio: 'pipe' }
+            { encoding: 'utf8', stdio: 'pipe' },
+            3  // 3 retries for critical API call
           );
           return true;
         } catch (error) {
@@ -1231,13 +1245,13 @@ Thumbs.db
               } else {
                 clearInterval(pollInterval);
                 console.log('⚠️  Could not auto-enable GitHub Pages.\n');
-                printManualInstructions();
+                provideFallbackInstructions(repoUrl, repoName, pagesUrl);  // USE provideFallbackInstructions
                 finishDeployment();
               }
             } else {
               clearInterval(pollInterval);
               console.log('⚠️  gh-pages branch not found after workflow completion.\n');
-              printManualInstructions();
+              provideFallbackInstructions(repoUrl, repoName, pagesUrl);  // USE provideFallbackInstructions
               finishDeployment();
             }
           } else {
@@ -1245,30 +1259,20 @@ Thumbs.db
             process.stdout.write(' ✗\n');
             console.log(`✗ Workflow failed with conclusion: ${workflowStatus.conclusion}\n`);
             console.log(`   Check workflow logs: ${repoUrl}/actions\n`);
-            printManualInstructions();
+            provideFallbackInstructions(repoUrl, repoName, pagesUrl);  // USE provideFallbackInstructions
             finishDeployment();
           }
         } else if (attempts >= maxAttempts) {
           clearInterval(pollInterval);
           process.stdout.write(' ⏱️\n');
           console.log('\n⏱️  Timeout: Workflow is taking longer than expected.\n');
-          printManualInstructions();
+          provideFallbackInstructions(repoUrl, repoName, pagesUrl);  // USE provideFallbackInstructions
           finishDeployment();
         } else {
           // Show progress
           process.stdout.write('.');
         }
       }, 15000); // Check every 15 seconds
-      
-      function printManualInstructions() {
-        console.log('📋 Manual Setup Instructions:\n');
-        console.log(`1. Check workflow status: ${repoUrl}/actions`);
-        console.log(`2. Once complete, go to: ${repoUrl}/settings/pages`);
-        console.log('3. Source: "Deploy from a branch"');
-        console.log('4. Branch: "gh-pages" / "/ (root)"');
-        console.log('5. Click "Save"');
-        console.log(`6. Your site will be live at: ${pagesUrl}\n`);
-      }
       
       function finishDeployment() {
         // Step 14: Cleanup
@@ -1406,6 +1410,7 @@ function updateImportPaths(tempDir, componentName) {
   return filesUpdated;
 }
 
+// Provide fallback instructions when automation fails
 function provideFallbackInstructions(repoUrl, repoName, pagesUrl) {
   console.log('\n╔════════════════════════════════════════════════════════════════╗');
   console.log('║  ⚠️  AUTOMATED GITHUB PAGES SETUP INCOMPLETE                   ║');
