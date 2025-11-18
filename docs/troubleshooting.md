@@ -59,6 +59,27 @@ npm --version
 
 ## Common known issues and it's solution
 
+### Why GitHub Pages Deployment Sometimes Fails
+
+**Root Causes:**
+
+**1. Permissions Issues (Most Common)**
+- GitHub Actions doesn't have write permissions by default on new repos
+- The `GITHUB_TOKEN` needs explicit permissions to create branches
+
+**2. Build Failures**
+- Missing dependencies not detected by auto-detection
+- TypeScript compilation errors
+- Path resolution issues in the new structure
+
+**3. Timing Issues**
+- GitHub API takes time to propagate repository settings
+- Workflow might start before repo is fully initialized
+
+**4. API Rate Limits**
+- GitHub CLI/API calls can hit rate limits
+- Especially if deploying multiple components quickly
+
 ### Issue 1: GitHub Actions Workflow Fails
 
 **Symptom:** Workflow runs but fails to build

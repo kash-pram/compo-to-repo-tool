@@ -26,6 +26,22 @@ function exec(command, options = {}) {
   }
 }
 
+function execWithRetry(command, options = {}, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return execSync(command, { encoding: 'utf8', stdio: 'pipe', ...options });
+    } catch (error) {
+      if (i === maxRetries - 1) {
+        throw error;
+      }
+      console.log(`   Retry ${i + 1}/${maxRetries}...`);
+      // Wait before retrying (exponential backoff)
+      const waitTime = Math.pow(2, i) * 1000;
+      execSync(`sleep ${waitTime / 1000}`, { stdio: 'pipe' });
+    }
+  }
+}
+
 // Utility: Copy file with directory creation
 function copyFile(src, dest) {
   const destDir = path.dirname(dest);
@@ -586,9 +602,15 @@ on:
       - main
   workflow_dispatch:
 
-# ADD THESE PERMISSIONS
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+# Prevent concurrent deployments
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -602,6 +624,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
       
       - name: Check for lock file
         id: check-lock
@@ -638,18 +661,49 @@ jobs:
             echo "BUILD_DIR=dist/\${{ steps.project-name.outputs.PROJECT_NAME }}" >> $GITHUB_OUTPUT
           fi
       
+      - name: Add .nojekyll file
+        run: touch \${{ steps.check-browser.outputs.BUILD_DIR }}/.nojekyll
+      
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: \${{ secrets.GITHUB_TOKEN }}
           publish_dir: \${{ steps.check-browser.outputs.BUILD_DIR }}
           publish_branch: gh-pages
+          force_orphan: true
+          commit_message: 'Deploy: \${{ github.sha }}'
 `;
   
   const workflowPath = path.join(workflowDir, 'deploy.yml');
   fs.writeFileSync(workflowPath, workflowContent);
   
   return workflowPath;
+}
+
+// Configure repository settings for GitHub Actions
+function configureRepositorySettings(repoName) {
+  console.log('⚙️  Configuring repository settings...');
+  
+  try {
+    // Enable GitHub Actions with write permissions
+    execSync(
+      `gh api repos/${config.githubUsername}/${repoName} -X PATCH -f allow_auto_merge=false -f delete_branch_on_merge=false`,
+      { encoding: 'utf8', stdio: 'pipe' }
+    );
+    
+    // Set default workflow permissions to read-write
+    execSync(
+      `gh api repos/${config.githubUsername}/${repoName}/actions/permissions -X PUT -f default_workflow_permissions=write -f can_approve_pull_request_reviews=false`,
+      { encoding: 'utf8', stdio: 'pipe' }
+    );
+    
+    console.log('✓ Repository settings configured\n');
+    return true;
+  } catch (error) {
+    console.warn('⚠️  Could not configure repository settings automatically');
+    console.warn('   You may need to set permissions manually\n');
+    return false;
+  }
 }
 
 function create404Page(tempDir) {
@@ -730,6 +784,47 @@ function addDeployScript(tempDir, repoName) {
   }
 }
 
+// Verify build works before pushing
+function verifyBuild(tempDir) {
+  console.log('🔍 Verifying build configuration...');
+  
+  const originalDir = process.cwd();
+  
+  try {
+    process.chdir(tempDir);
+    
+    // Install dependencies
+    console.log('   Installing dependencies...');
+    execSync('npm install', { encoding: 'utf8', stdio: 'pipe' });
+    
+    // Try to build
+    console.log('   Running test build...');
+    execSync('npm run build', { encoding: 'utf8', stdio: 'pipe' });
+    
+    console.log('✓ Build verification successful\n');
+    
+    // Clean up build artifacts
+    const distPath = path.join(tempDir, 'dist');
+    if (fs.existsSync(distPath)) {
+      fs.rmSync(distPath, { recursive: true, force: true });
+    }
+    
+    process.chdir(originalDir);
+    return true;
+  } catch (error) {
+    console.error('❌ Build verification failed!');
+    console.error('   Error:', error.message);
+    console.error('\n   This means the deployment will fail.');
+    console.error('   Please check:');
+    console.error('   1. All dependencies are correctly detected');
+    console.error('   2. Component has no TypeScript errors');
+    console.error('   3. All imports are valid\n');
+    
+    process.chdir(originalDir);
+    return false;
+  }
+}
+
 // Main deployment function
 async function deployComponent() {
   console.log('🚀 Angular Component Deployment Tool\n');
@@ -794,6 +889,19 @@ async function deployComponent() {
     const manualDeps = loadComponentDependencies(componentName);
     const autoDetected = detectImports(componentPath);
     
+    // Validate component has required files
+    console.log('🔍 Validating component structure...');
+    const componentFiles = fs.readdirSync(componentPath);
+    const hasTsFile = componentFiles.some(f => f.endsWith('.ts'));
+
+    if (!hasTsFile) {
+      console.error('❌ No TypeScript file found in component!');
+      console.error('   Component must have at least a .ts file');
+      process.exit(1);
+    }
+
+    console.log('✓ Component structure valid\n');
+
     console.log('📦 Detecting npm packages...');
     const usedPackages = detectNpmDependencies(componentPath);
     console.log(`✓ Found ${usedPackages.length} npm packages\n`);
@@ -990,21 +1098,56 @@ Thumbs.db
       } else {
         console.log('⚠️  Could not add deploy script\n');
       }
+      
+      // NEW: Verify build before pushing
+      console.log('🔨 Running build verification (this may take 1-2 minutes)...\n');
+      const buildSuccess = verifyBuild(tempDir);
+      
+      if (!buildSuccess) {
+        console.error('❌ Build verification failed!');
+        console.error('   Deployment aborted to prevent broken repository.\n');
+        
+        // Cleanup
+        const currentDir = process.cwd();
+        if (currentDir.includes('temp-deploy')) {
+          process.chdir('..');
+        }
+        if (fs.existsSync(tempDir)) {
+          fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+        
+        // Delete the created repository
+        console.log('🗑️  Cleaning up: Deleting created repository...');
+        try {
+          execSync(`gh repo delete ${config.githubUsername}/${repoName} --yes`, { stdio: 'pipe' });
+          console.log('✓ Repository deleted\n');
+        } catch (error) {
+          console.warn('⚠️  Could not delete repository automatically');
+          console.warn(`   Please delete manually: https://github.com/${config.githubUsername}/${repoName}/settings\n`);
+        }
+        
+        process.exit(1);
+      }
     }
-    
+
     // Step 13: Initialize git and push
     console.log('🔧 Initializing Git repository...');
     process.chdir(tempDir);
-    
+
     exec('git init');
     exec('git add .');
     exec('git commit -m "Initial commit: Angular base + ' + componentName + ' component with dependencies"');
     exec('git branch -M main');
     exec(`git remote add origin ${repoUrl}.git`);
-    
+
     console.log('📤 Pushing to GitHub...');
     exec('git push -u origin main');
     console.log('✓ Pushed successfully!\n');
+
+    // NEW: Configure repository settings
+    if (config.githubPages && config.githubPages.enabled) {
+      configureRepositorySettings(repoName);
+    }
     
     // Step 13.5: Auto-enable GitHub Pages after workflow completes
     if (config.githubPages && config.githubPages.enabled) {
@@ -1261,6 +1404,42 @@ function updateImportPaths(tempDir, componentName) {
   
   console.log(`✓ Updated import paths in ${filesUpdated} files\n`);
   return filesUpdated;
+}
+
+function provideFallbackInstructions(repoUrl, repoName, pagesUrl) {
+  console.log('\n╔════════════════════════════════════════════════════════════════╗');
+  console.log('║  ⚠️  AUTOMATED GITHUB PAGES SETUP INCOMPLETE                   ║');
+  console.log('╚════════════════════════════════════════════════════════════════╝\n');
+  
+  console.log('The repository was created successfully, but GitHub Pages');
+  console.log('needs to be set up manually. Follow these steps:\n');
+  
+  console.log('📋 MANUAL SETUP STEPS:\n');
+  
+  console.log('Step 1: Configure Workflow Permissions');
+  console.log(`   → Go to: ${repoUrl}/settings/actions`);
+  console.log('   → Under "Workflow permissions", select:');
+  console.log('     ✓ "Read and write permissions"');
+  console.log('   → Click "Save"\n');
+  
+  console.log('Step 2: Trigger Workflow');
+  console.log(`   → Go to: ${repoUrl}/actions`);
+  console.log('   → Click "Deploy to GitHub Pages" workflow');
+  console.log('   → Click "Run workflow" → "Run workflow"');
+  console.log('   → Wait 1-2 minutes for completion\n');
+  
+  console.log('Step 3: Enable GitHub Pages');
+  console.log(`   → Go to: ${repoUrl}/settings/pages`);
+  console.log('   → Source: "Deploy from a branch"');
+  console.log('   → Branch: "gh-pages" / "/ (root)"');
+  console.log('   → Click "Save"\n');
+  
+  console.log('Step 4: Access Your Site');
+  console.log(`   → Wait 1-2 minutes for deployment`);
+  console.log(`   → Visit: ${pagesUrl}\n`);
+  
+  console.log('💡 TIP: If workflow fails, check the Actions tab for error details.\n');
+  console.log('═══════════════════════════════════════════════════════════════\n');
 }
 
 // Run the deployment

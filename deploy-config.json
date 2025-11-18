@@ -31,6 +31,9 @@
   "githubPages": {
     "enabled": true,
     "createWorkflow": true,
-    "create404": true
+    "create404": true,
+    "verifyBuild": true,
+    "configurePermissions": true,
+    "retryAttempts": 3
   }
 }
