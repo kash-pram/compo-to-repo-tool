@@ -1,0 +1,77 @@
+Component-to-Repo Deployment Tool
+Copyright (c) 2025 kash-pram
+GitHub: https://github.com/kash-pram/compo-to-repo-tool
+
+================================================================================
+
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+This project uses the following third-party tools and technologies:
+
+1. Node.js
+   - License: MIT License
+   - Website: https://nodejs.org/
+   - Copyright: Node.js contributors
+
+2. GitHub CLI (gh)
+   - License: MIT License
+   - Website: https://cli.github.com/
+   - Copyright: GitHub, Inc.
+
+3. Angular
+   - License: MIT License
+   - Website: https://angular.io/
+   - Copyright: Google LLC
+
+4. Git
+   - License: GPL v2
+   - Website: https://git-scm.com/
+
+================================================================================
+
+COMPLIANCE REQUIREMENTS
+
+Users of this tool must comply with:
+
+1. GitHub Terms of Service
+   https://docs.github.com/en/site-policy/github-terms/github-terms-of-service
+
+2. GitHub API Terms of Use
+   https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features
+
+3. GitHub CLI Terms
+
+4. All applicable open-source licenses of dependencies
+
+5. Your organization's internal policies and procedures
+
+================================================================================
+
+USER RESPONSIBILITIES
+
+This tool automates interactions with GitHub's API. Users are responsible for:
+
+- Complying with GitHub's API rate limits and usage policies
+- Ensuring proper authentication and permissions
+- Verifying they have legal rights to deploy all code
+- Following their organization's security and compliance policies
+- Respecting intellectual property rights
+- Maintaining confidentiality of sensitive information
+- Backing up data before using this tool
+- Understanding the implications of creating public repositories
+
+================================================================================
+
+NO WARRANTY
+
+This software is provided "as is" without warranty of any kind. See LICENSE
+file for full warranty disclaimer.
+
+================================================================================
+
+ATTRIBUTION
+
+If you use this tool in your projects, attribution is appreciated but not
+required under the MIT License. You may attribute as:
+
+"Component deployment powered by compo-to-repo-tool by kash-pram"

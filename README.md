@@ -319,32 +319,57 @@ Built with:
 
 ---
 
-## 📜 License
+## ⚠️ Important Legal Information
 
-MIT License - Free to use in personal and commercial projects.
+### Disclaimer
 
-```
-Copyright (c) 2025
+**USE AT YOUR OWN RISK**
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This tool is provided "as is" without warranty of any kind. Before using this tool, please read:
+- [LICENSE](./LICENSE) - MIT License terms
+- [DISCLAIMER.md](./DISCLAIMER.md) - Complete terms of use and liability limitations
+- [SECURITY.md](./SECURITY.md) - Security considerations and best practices
+- [NOTICE](./NOTICE) - Third-party software notices
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+### Critical Warnings
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+⚠️ **BACKUP YOUR CODE**: Always backup your code before using this tool  
+⚠️ **REVIEW BEFORE PUSHING**: Review all generated files before making repositories public  
+⚠️ **NO SECRETS**: Never include API keys, passwords, or credentials in your code  
+⚠️ **IRREVERSIBLE**: Repository creation and code pushing cannot be easily undone  
+⚠️ **YOUR RESPONSIBILITY**: You are solely responsible for what you deploy  
+
+### Required Acknowledgments
+
+By using this tool, you acknowledge:
+- ✅ You have read the disclaimer and license
+- ✅ You accept all risks associated with using this tool
+- ✅ You have proper rights to all code being deployed
+- ✅ You will comply with GitHub's Terms of Service
+- ✅ You will not hold the author(s) liable for any damages
+- ✅ You understand operations are irreversible
+
+### User Responsibilities
+
+You are responsible for:
+- Ensuring you have legal rights to deploy all code
+- Verifying compliance with all applicable licenses
+- Following your organization's policies
+- Protecting sensitive information
+- Complying with GitHub's Terms of Service and API policies
+- Creating backups before use
+- Testing in a safe environment first
+- Reviewing all files before pushing to public repositories
+
+### Support and Liability
+
+- **No Warranty**: This software comes with absolutely no warranty
+- **No Liability**: Authors are not liable for any damages or issues
+- **Community Support**: Support is community-based via GitHub issues
+- **Security Issues**: Report privately (see SECURITY.md)
+
+For complete terms, see [DISCLAIMER.md](./DISCLAIMER.md).
 
 ---
 
-**Made with ❤️ for Angular Developers**
+**Happy Coding! 🌐**
