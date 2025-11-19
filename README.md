@@ -339,16 +339,6 @@ This tool is provided "as is" without warranty of any kind. Before using this to
 ⚠️ **IRREVERSIBLE**: Repository creation and code pushing cannot be easily undone  
 ⚠️ **YOUR RESPONSIBILITY**: You are solely responsible for what you deploy  
 
-### Required Acknowledgments
-
-By using this tool, you acknowledge:
-- ✅ You have read the disclaimer and license
-- ✅ You accept all risks associated with using this tool
-- ✅ You have proper rights to all code being deployed
-- ✅ You will comply with GitHub's Terms of Service
-- ✅ You will not hold the author(s) liable for any damages
-- ✅ You understand operations are irreversible
-
 ### User Responsibilities
 
 You are responsible for:
