@@ -10,7 +10,10 @@ The tool will ask you:
 4. **Description**: Optional description for the repo
 
 # Follow the prompts:
+
 ### Example Session
+
+**Public Repository:**
 ```
 🚀 Angular Component Deployment Tool
 
@@ -20,12 +23,30 @@ The tool will ask you:
 📄 Repository description (optional): Interactive 3D word cloud
 
 ⚙️  Starting deployment process...
+```
 
-# ✅ Repository created
-# ✅ Component deployed
-# ✅ GitHub Pages enabled
-# ✅ Live at: https://your-username.github.io/awesome-component-demo/
+**Private Repository:**
+```
+🚀 Angular Component Deployment Tool
 
+📦 Component name (e.g., word-cloud): word-cloud
+📝 New repository name: word-cloud-private
+🔒 Repository visibility (public/private) [public]: private
+
+⚠️  IMPORTANT: GitHub Pages Notice
+   GitHub Pages is only available for public repositories on free accounts.
+   This deployment will:
+   ✓ Create the private repository
+   ✓ Set up GitHub Actions workflow
+   ✓ Create gh-pages branch
+   ✓ Skip automatic Pages enablement
+
+   To enable Pages later: Make repo public, then manually enable Pages.
+
+   Continue with private repository? (yes/no) [yes]: yes
+📄 Repository description (optional): Private component demo
+
+⚙️  Starting deployment process...
 ```
 
 ### What Happens
@@ -33,12 +54,27 @@ The tool will ask you:
 1. **Analysis** (10 sec) - Detects dependencies
 2. **Repository Creation** (5 sec) - Creates GitHub repo
 3. **File Copying** (15 sec) - Copies component and dependencies
-4. **Package Filtering** (10 sec) - Creates optimized package.json
-5. **Git Push** (10 sec) - Pushes to GitHub
-6. **GitHub Actions Wait** (1-3 min) - Waits for workflow to complete
-7. **Pages Activation** (10 sec) - Enables GitHub Pages
+4. **Documentation Copying** (2 sec) - Copies LICENSE, DISCLAIMER, etc.
+5. **Package Filtering** (10 sec) - Creates optimized package.json
+6. **Git Push** (10 sec) - Pushes to GitHub
+7. **GitHub Actions Wait** (1-3 min) - Waits for workflow (public repos only)
+8. **Pages Activation** (10 sec) - Enables GitHub Pages (public repos only)
 
-**Total Time: 2-4 minutes**
+**Total Time:** 
+- **Public repos:** 2-4 minutes (full automation)
+- **Private repos:** 1 minute (workflow setup only, Pages skipped)
+
+### Private Repository Notice
+
+⚠️ **GitHub Pages is only available for public repositories on free accounts.**
+
+If you create a private repository, the tool will:
+- ✅ Create the repository
+- ✅ Set up GitHub Actions workflow
+- ✅ Create gh-pages branch structure
+- ⏭️ Skip automatic Pages enablement
+
+To enable Pages later: Make the repository public, then manually activate Pages in Settings.
 
 
 | Step | What Happens | Files Affected |

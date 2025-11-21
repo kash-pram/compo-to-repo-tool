@@ -35,6 +35,17 @@ Always test in a safe environment first with test repositories.
 
 ---
 
+# Angular Component Deployment Automation Tool
+
+**Automate the deployment of Angular components to GitHub with automatic GitHub Pages setup.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D20.19-brightgreen)](https://nodejs.org/)
+[![Angular Version](https://img.shields.io/badge/angular-%3E%3D20-red)](https://angular.dev/)
+[![GitHub CLI](https://img.shields.io/badge/GitHub_CLI-required-blue)](https://cli.github.com/)
+
+---
+
 ## 📋 Table of Contents
 
 - [Purpose](#purpose-)
@@ -293,6 +304,8 @@ After running the tool, verify:
 
 
 You'll know deployment succeeded when you see:
+
+**For Public Repository:**
 ```
 🎉 SUCCESS! Deployment completed!
 
@@ -301,14 +314,34 @@ You'll know deployment succeeded when you see:
 🔗 Repository: https://github.com/user/word-cloud-demo
 👁️  Visibility: public
 📊 Dependencies: 5 items
+📄 Documentation: 5 files copied
 🌐 GitHub Pages: Enabled
 🔗 Site URL: https://user.github.io/word-cloud-demo/
 ⚙️  Auto-deploy: On push to main branch
+🛠️  Manual deploy: npm run deploy:manual
 ═══════════════════════════════════════
 ```
 
 Visit the site URL to see your deployed component live! 🚀
 
+
+**For Private Repository:**
+```
+🎉 SUCCESS! Deployment completed!
+
+═══════════════════════════════════════
+📦 Component: word-cloud-private
+🔗 Repository: https://github.com/user/word-cloud-private
+👁️  Visibility: private
+📊 Dependencies: 5 items
+📄 Documentation: 5 files copied
+🌐 GitHub Pages: Not enabled (private repository)
+📋 Workflow: Ready (will work when repo is public)
+⚙️  gh-pages branch: Will be created on first workflow run
+═══════════════════════════════════════
+```
+
+---
 
 ## Safety Checklist Before Deployment
 

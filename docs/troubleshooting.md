@@ -37,6 +37,7 @@ npm cache clean --force
 
 
 ### Common Commands
+
 ```bash
 # Check GitHub CLI auth status
 gh auth status
@@ -56,6 +57,33 @@ npm --version
 
 ---
 
+## ❓ FAQ
+
+### Can I deploy multiple components at once?
+No, the tool deploys one component at a time. Run it multiple times for different components.
+
+### Will this work with Angular 17/18/19?
+The tool is designed for Angular 20+ but may work with 17-19. Test thoroughly.
+
+### Can I deploy to a different branch name?
+No, it always uses `gh-pages`. This is the GitHub Pages standard.
+
+### What happens to my original component?
+Nothing. The tool copies files - your original component remains unchanged.
+
+### Can I customize the generated README?
+Yes! Add a `README.md` file inside your component folder. The tool will use it instead of auto-generating one.
+
+### Does this work with GitHub Enterprise?
+It should work if GitHub CLI is properly configured for your enterprise instance.
+
+### What if I need a custom build process?
+You can modify the GitHub Actions workflow in the deployed repo's `.github/workflows/deploy.yml`.
+
+### Can I deploy from a monorepo?
+Yes, as long as components are in `src/app/components/`.
+
+---
 
 ## Common known issues and it's solution
 
@@ -167,6 +195,39 @@ npm --version
 5. Click **Save**
 6. Wait 1-2 minutes for deployment
 7. Site will be live at: `https://your-username.github.io/repo-name/`
+
+### Issue 3.5: Private Repository and GitHub Pages
+
+**Symptom:** Created private repo but want GitHub Pages
+
+**Limitation:** GitHub Pages requires public repositories on free accounts.
+
+**Solution:**
+
+**Option 1: Make Repository Public**
+1. Go to: `https://github.com/your-username/repo-name/settings`
+2. Scroll to "Danger Zone"
+3. Click "Change visibility" → "Change to public"
+4. Confirm the change
+5. Go to: `https://github.com/your-username/repo-name/settings/pages`
+6. Source: "Deploy from a branch"
+7. Branch: `gh-pages` / `/ (root)`
+8. Click Save
+
+**Option 2: Use GitHub Pro/Team Account**
+- Upgrade to GitHub Pro for private repo Pages support
+- Cost: $4/month per user
+- Go to: https://github.com/settings/billing
+
+**Option 3: Deploy Elsewhere**
+- Use Netlify, Vercel, or Cloudflare Pages (support private repos)
+- Connect your private GitHub repo
+- These services can build from private repositories
+
+**What the Tool Already Set Up:**
+- ✅ GitHub Actions workflow (ready to work when public)
+- ✅ Proper build configuration
+- ✅ gh-pages branch will be created on first workflow run
 
 ### Issue 4: Site Shows 404 or Blank Page
 

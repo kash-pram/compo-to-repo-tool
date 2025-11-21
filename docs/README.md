@@ -166,7 +166,7 @@ gh auth login
 - [ ] Celebrate! 🎉
 
 
-### ✅ Pre-Deployment Checklist
+## ✅ Pre-Deployment Checklist
 
 Before running the tool, verify:
 
@@ -177,6 +177,22 @@ Before running the tool, verify:
 - [ ] `deploy-config.json` has your GitHub username
 - [ ] You're in the Angular project root directory
 - [ ] Component builds successfully in your project (`ng serve`)
+- [ ] Documentation files exist if you want them copied (LICENSE, DISCLAIMER.md, etc.)
+- [ ] **For public repos:** Understand that site will be publicly accessible
+- [ ] **For private repos:** Understand that GitHub Pages won't work (free account)
+```
+
+## Summary of Changes
+
+| Change | Purpose | Files Modified |
+|--------|---------|---------------|
+| **Private repo warning** | Inform users about limitations | `deploy-component.js` |
+| **Skip Pages for private** | Don't wait for Pages on private repos | `deploy-component.js` |
+| **Documentation files** | Copy LICENSE, DISCLAIMER | `deploy-config.json`, `deploy-component.js` |
+| **README updates** | Document new behavior | `README.md` |
+| **Success message** | Different message for private repos | `deploy-component.js` |
+
+All these changes are **non-breaking** - existing functionality remains the same, just enhanced! 🚀
 
 ---
 
@@ -264,6 +280,8 @@ After running the tool, verify:
 
 
 You'll know deployment succeeded when you see:
+
+**For Public Repository:**
 ```
 🎉 SUCCESS! Deployment completed!
 
@@ -272,13 +290,32 @@ You'll know deployment succeeded when you see:
 🔗 Repository: https://github.com/user/word-cloud-demo
 👁️  Visibility: public
 📊 Dependencies: 5 items
+📄 Documentation: 5 files copied
 🌐 GitHub Pages: Enabled
 🔗 Site URL: https://user.github.io/word-cloud-demo/
 ⚙️  Auto-deploy: On push to main branch
+🛠️  Manual deploy: npm run deploy:manual
 ═══════════════════════════════════════
 ```
 
 Visit the site URL to see your deployed component live! 🚀
+
+
+**For Private Repository:**
+```
+🎉 SUCCESS! Deployment completed!
+
+═══════════════════════════════════════
+📦 Component: word-cloud-private
+🔗 Repository: https://github.com/user/word-cloud-private
+👁️  Visibility: private
+📊 Dependencies: 5 items
+📄 Documentation: 5 files copied
+🌐 GitHub Pages: Not enabled (private repository)
+📋 Workflow: Ready (will work when repo is public)
+⚙️  gh-pages branch: Will be created on first workflow run
+═══════════════════════════════════════
+```
 
 ---
 

@@ -12,6 +12,58 @@
 }
 ```
 
+### Default Configuration
+
+Your `deploy-config.json` should look like this:
+```json
+{
+  "baseFiles": [
+    "package.json",
+    "angular.json",
+    "tsconfig.json",
+    "tsconfig.app.json",
+    "tsconfig.spec.json",
+    ".gitignore",
+    "src/main.ts",
+    "src/index.html",
+    "src/styles.css",
+    "src/styles.scss",
+    "src/app/app.ts",
+    "src/app/app.html",
+    "src/app/app.css",
+    "src/app/app.config.ts",
+    "src/app/app.routes.ts"
+  ],
+  "githubUsername": "your-github-username",
+  "defaultVisibility": "public",
+  "alwaysIncludeFolders": [
+    "src/app/services",
+    "src/app/models",
+    "src/app/shared",
+    "src/environments"
+  ],
+  "alwaysIncludeFiles": [
+    "src/environments/environment.ts",
+    "src/environments/environment.prod.ts"
+  ],
+  "documentationFiles": [
+    "LICENSE",
+    "DISCLAIMER.md",
+    "docs/CODE_OF_CONDUCT.md",
+    "docs/CONTRIBUTING.md",
+    "docs/SECURITY.md"
+  ],
+  "githubPages": {
+    "enabled": true,
+    "createWorkflow": true,
+    "create404": true
+  }
+}
+```
+
+⚠️ **Important:** Change `"githubUsername"` to your actual GitHub username before using!
+
+
 #### 2. Choose Default Visibility
 
 ```json
@@ -86,6 +138,9 @@ Folders automatically copied to every deployment:
 
 
 ### `deploy-config.json` Structure
+
+> 📄 [View complete configuration file](../deploy-config.json)
+
 ```json
 {
   "baseFiles": [
@@ -105,6 +160,13 @@ Folders automatically copied to every deployment:
   "alwaysIncludeFiles": [
     // Files always copied (if they exist)
     "src/environments/environment.ts"
+  ],
+  "documentationFiles": [
+    // Legal and documentation files
+    "LICENSE",                    // Software license
+    "DISCLAIMER.md",              // Usage disclaimer
+    "CONTRIBUTING.md",            // Contribution guidelines
+    "CODE_OF_CONDUCT.md"         // Community guidelines
   ],
   "githubPages": {
     "enabled": true,              // Enable GitHub Pages setup
@@ -136,6 +198,61 @@ Folders automatically copied to every deployment:
 ---
 
 ## 📁 File Structure
+
+
+
+
+## 📂 Repository Structure
+
+### This Tool Repository
+```
+compo-to-repo-tool/
+├── src/                          # Your Angular project
+│   └── app/
+│       └── components/           # Components to deploy
+│           ├── component-1/
+│           ├── component-2/
+│           └── ...
+├── docs/                         # Documentation
+│   ├── CODE_OF_CONDUCT.md
+│   ├── CONTRIBUTING.md
+│   └── SECURITY.md
+├── deploy-component.js           # Main tool script
+├── deploy-config.json            # Configuration
+├── LICENSE                       # MIT License
+├── DISCLAIMER.md                 # Legal disclaimer
+├── README.md                     # This documentation
+├── package.json                  # Project dependencies
+└── angular.json                  # Angular configuration
+```
+
+### Deployed Repository (Generated)
+```
+deployed-component-repo/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml            # Auto-deployment workflow
+├── docs/                         # Copied from source
+│   ├── CODE_OF_CONDUCT.md
+│   ├── CONTRIBUTING.md
+│   └── SECURITY.md
+├── src/
+│   ├── app/
+│   │   └── component-name/       # Your component
+│   ├── index.html
+│   └── 404.html                  # For Angular routing
+├── LICENSE                       # Copied from source
+├── DISCLAIMER.md                 # Copied from source
+├── README.md                     # Auto-generated
+├── package.json                  # Filtered dependencies
+├── package-lock.json             # Generated
+├── angular.json                  # Updated config
+└── tsconfig.json                 # TypeScript config
+```
+
+
+
+
 
 ### Tool Files
 ```
