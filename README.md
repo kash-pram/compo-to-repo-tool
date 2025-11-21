@@ -20,6 +20,21 @@ npm run deploy-component
 
 ---
 
+## ⚠️ Important Legal Notice
+
+**READ BEFORE USE**: This tool performs automated GitHub operations that can create, modify, and deploy code. 
+
+- 📄 [LICENSE](./LICENSE) - MIT License terms
+- ⚠️ [DISCLAIMER](./DISCLAIMER.md) - **REQUIRED READING** - Liability and risk warnings
+- 📋 [NOTICE](./NOTICE.md) - Third-party attributions and dependencies
+- 🔒 [SECURITY](./SECURITY.md) - Security considerations and best practices
+
+**BY USING THIS TOOL, YOU ACCEPT ALL RISKS AND RESPONSIBILITIES.** The authors provide NO WARRANTY and accept NO LIABILITY for any damages or losses.
+
+Always test in a safe environment first with test repositories.
+
+---
+
 ## 📋 Table of Contents
 
 - [Purpose](#purpose-)
@@ -92,6 +107,22 @@ Live demo at: your-username.github.io/component-name
 ## Prerequisites 📦
 
 ![Angular](https://img.shields.io/badge/Angular-20-red?style=flat-square&logo=angular) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript) ![Node.js](https://img.shields.io/badge/Node.js-16+-green?style=flat-square&logo=node.js) ![GitHub CLI](https://img.shields.io/badge/GitHub_CLI-2.0+-black?style=flat-square&logo=github)
+
+
+## Prerequisites
+
+### ⚠️ BEFORE YOU START - MANDATORY READING
+
+**YOU MUST:**
+1. ✅ Read the [DISCLAIMER](./DISCLAIMER.md) in full
+2. ✅ Understand the risks (data loss, public exposure, etc.)
+3. ✅ Have a backup of your code
+4. ✅ Test with non-sensitive code first
+5. ✅ Use a test GitHub account initially
+
+**By proceeding, you acknowledge you have read and accept all terms in the DISCLAIMER.**
+
+
 
 ### Required Software
 
@@ -278,6 +309,21 @@ You'll know deployment succeeded when you see:
 
 Visit the site URL to see your deployed component live! 🚀
 
+
+## Safety Checklist Before Deployment
+
+Before running `npm run deploy-component`, verify:
+
+- [ ] Backed up your source code
+- [ ] Reviewed component for sensitive data (API keys, secrets, credentials)
+- [ ] Tested with a dummy component first
+- [ ] Using appropriate repository visibility (public/private)
+- [ ] Understand GitHub costs (if using private repos)
+- [ ] Component contains no proprietary code (if deploying publicly)
+- [ ] Import paths can be safely modified
+- [ ] Dependencies are correctly identified
+- [ ] Have necessary rights to deploy this code
+
 ---
 
 ## Workflow 🔍
@@ -318,6 +364,34 @@ Built with:
 - 🚀 **GitHub Pages** - For free hosting
 
 ---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for full terms.
+
+### Important License Terms
+
+**Key Points:**
+- ✅ Free to use, modify, and distribute
+- ✅ Commercial use allowed
+- ⚠️ **NO WARRANTY** - Use at your own risk
+- ⚠️ **NO LIABILITY** - Authors not responsible for damages
+- 📋 Must include copyright notice and license in copies
+
+**Required Attributions:**
+- See [NOTICE.md](./NOTICE.md) for third-party dependencies
+- See [DISCLAIMER.md](./DISCLAIMER.md) for full terms
+
+### Your Responsibilities When Using This Tool
+
+You are responsible for:
+- Legal compliance in your jurisdiction
+- Intellectual property rights
+- Security of deployed code
+- Costs incurred from GitHub operations
+- Any damages or losses from tool usage
+
+For detailed terms, read the [LICENSE](./LICENSE), [DISCLAIMER](./DISCLAIMER.md), and [SECURITY](./SECURITY.md) files.
 
 ## ⚠️ Important Legal Information
 

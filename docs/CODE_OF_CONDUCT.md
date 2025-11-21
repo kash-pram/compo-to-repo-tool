@@ -145,7 +145,7 @@ For answers to common questions about this code of conduct, see the FAQ at https
 
 We may update this Code of Conduct from time to time. We will notify the community of any material changes by posting a notice in the repository.
 
-**Last Updated**: December 2024
+**Last Updated**: November 2025
 
 ---
 
