@@ -30,10 +30,11 @@
   ],
   "documentationFiles": [
     "LICENSE",
-    "DISCLAIMER.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "docs/DISCLAIMER.md",
     "docs/CODE_OF_CONDUCT.md",
-    "docs/CONTRIBUTING.md",
-    "SECURITY.md"
+    "docs/NOTICE.md"
   ],
   "githubPages": {
     "enabled": true,

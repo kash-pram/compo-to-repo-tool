@@ -1,3 +1,27 @@
+/**
+ * Component to Repository Deployment Tool
+ * 
+ * @license MIT License - See LICENSE file
+ * @author Prakash Mariappan
+ * @copyright 2025 Prakash Mariappan
+ * 
+ * IMPORTANT WARNINGS:
+ * - This tool creates, modifies, and deploys code to GitHub
+ * - NO WARRANTY provided - use at your own risk
+ * - Authors NOT LIABLE for any damages or losses
+ * - YOU are responsible for all consequences of using this tool
+ * 
+ * REQUIRED: Read DISCLAIMER.md before use
+ * 
+ * By using this script, you accept all terms in:
+ * - LICENSE
+ * - DISCLAIMER.md  
+ * - SECURITY.md
+ * 
+ * @see https://github.com/kash-pram/compo-to-repo-tool
+ */
+
+
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -11,6 +35,42 @@ const rl = readline.createInterface({
 
 // Promisify question
 const question = (query) => new Promise((resolve) => rl.question(query, resolve));
+
+async function getUserAcknowledgment() {
+  console.log('\n╔═══════════════════════════════════════════════════════════════╗');
+  console.log('║              ⚠️  IMPORTANT LEGAL NOTICE ⚠️                    ║');
+  console.log('╚═══════════════════════════════════════════════════════════════╝\n');
+  
+  console.log('This tool performs automated file operations and GitHub deployments.');
+  console.log('Please review these documents before proceeding:\n');
+  
+  console.log('  📄 DISCLAIMER.md  - ⚠️  REQUIRED READING - Liability and risk warnings');
+  console.log('  📄 LICENSE        - MIT License terms');
+  console.log('  🔒 SECURITY.md    - Security considerations and best practices\n');
+  
+  console.log('By proceeding, you acknowledge that:\n');
+  console.log('  ✓ You have read and understood the DISCLAIMER.md');
+  console.log('  ✓ You accept all risks and responsibilities');
+  console.log('  ✓ You will not hold authors liable for any damages');
+  console.log('  ✓ You have backed up your code');
+  console.log('  ✓ You have reviewed the component for sensitive data');
+  console.log('  ✓ You understand this tool may create, modify, or delete files\n');
+  
+  const answer = await question('Do you accept these terms and wish to proceed? (yes/no): ');
+  
+  if (answer.toLowerCase() !== 'yes') {
+    console.log('\n❌ Terms not accepted. Exiting...\n');
+    console.log('Please read the following files before using this tool:');
+    console.log('  - DISCLAIMER.md');
+    console.log('  - LICENSE');
+    console.log('  - SECURITY.md\n');
+    console.log('These files are located in the project root directory.\n');
+    process.exit(0);
+  }
+  
+  console.log('\n✅ Terms accepted. Proceeding with deployment...\n');
+  console.log('═══════════════════════════════════════════════════════════════\n');
+}
 
 // Load configuration
 const config = JSON.parse(fs.readFileSync('deploy-config.json', 'utf8'));
@@ -833,6 +893,9 @@ function verifyBuild(tempDir) {
 
 // Main deployment function
 async function deployComponent() {
+  // NEW: Show legal notice and get user acknowledgment FIRST
+  await getUserAcknowledgment();
+
   console.log('🚀 Angular Component Deployment Tool\n');
   
   // Step 1: Get component name
