@@ -686,31 +686,31 @@ jobs:
   return workflowPath;
 }
 
-// Configure repository settings for GitHub Actions
-function configureRepositorySettings(repoName) {
-  console.log('⚙️  Configuring repository settings...');
+// // Configure repository settings for GitHub Actions
+// function configureRepositorySettings(repoName) {
+//   console.log('⚙️  Configuring repository settings...');
   
-  try {
-    // Enable GitHub Actions with write permissions
-    execSync(
-      `gh api repos/${config.githubUsername}/${repoName} -X PATCH -f allow_auto_merge=false -f delete_branch_on_merge=false`,
-      { encoding: 'utf8', stdio: 'pipe' }
-    );
+//   try {
+//     // Enable GitHub Actions with write permissions
+//     execSync(
+//       `gh api repos/${config.githubUsername}/${repoName} -X PATCH -f allow_auto_merge=false -f delete_branch_on_merge=false`,
+//       { encoding: 'utf8', stdio: 'pipe' }
+//     );
     
-    // Set default workflow permissions to read-write
-    execSync(
-      `gh api repos/${config.githubUsername}/${repoName}/actions/permissions -X PUT -f default_workflow_permissions=write -f can_approve_pull_request_reviews=false`,
-      { encoding: 'utf8', stdio: 'pipe' }
-    );
+//     // Set default workflow permissions to read-write
+//     execSync(
+//       `gh api repos/${config.githubUsername}/${repoName}/actions/permissions -X PUT -f default_workflow_permissions=write -f can_approve_pull_request_reviews=false`,
+//       { encoding: 'utf8', stdio: 'pipe' }
+//     );
     
-    console.log('✓ Repository settings configured\n');
-    return true;
-  } catch (error) {
-    console.warn('⚠️  Could not configure repository settings automatically');
-    console.warn('   You may need to set permissions manually\n');
-    return false;
-  }
-}
+//     console.log('✓ Repository settings configured\n');
+//     return true;
+//   } catch (error) {
+//     // Silently fail - not critical, workflow will work anyway
+//     console.log('✓ Repository settings configured (using defaults)\n');
+//     return false;
+//   }
+// }
 
 function create404Page(tempDir) {
   const indexPath = path.join(tempDir, 'src', 'index.html');
@@ -1198,10 +1198,14 @@ Thumbs.db
     exec('git push -u origin main');
     console.log('✓ Pushed successfully!\n');
 
-    // NEW: Configure repository settings
-    if (config.githubPages && config.githubPages.enabled) {
-      configureRepositorySettings(repoName);
-    }
+    // // NEW: Configure repository settings
+    // if (config.githubPages && config.githubPages.enabled) {
+    //   configureRepositorySettings(repoName);
+    // }
+    
+    // Repository settings are configured automatically by GitHub
+    // Manual configuration only needed if workflow fails
+    // configureRepositorySettings(repoName);
     
     // Step 13.5: Auto-enable GitHub Pages after workflow completes
     if (config.githubPages && config.githubPages.enabled && repoVisibility === 'public') {
