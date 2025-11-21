@@ -28,6 +28,13 @@
     "src/environments/environment.ts",
     "src/environments/environment.prod.ts"
   ],
+  "documentationFiles": [
+    "LICENSE",
+    "DISCLAIMER.md",
+    "docs/CODE_OF_CONDUCT.md",
+    "docs/CONTRIBUTING.md",
+    "SECURITY.md"
+  ],
   "githubPages": {
     "enabled": true,
     "createWorkflow": true,
