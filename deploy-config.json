@@ -32,9 +32,9 @@
     "LICENSE",
     "CONTRIBUTING.md",
     "SECURITY.md",
-    "docs/DISCLAIMER.md",
-    "docs/CODE_OF_CONDUCT.md",
-    "docs/NOTICE.md"
+    "DISCLAIMER.md",
+    "CODE_OF_CONDUCT.md",
+    "NOTICE.md"
   ],
   "githubPages": {
     "enabled": true,
